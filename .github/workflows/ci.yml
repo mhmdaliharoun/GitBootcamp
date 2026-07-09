@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: M365 User Report
 
 on:
   push:
@@ -6,16 +6,29 @@ on:
       - main
 
 jobs:
-  run-powershell:
+  report:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      - name: Run PowerShell script
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Microsoft Graph
         shell: pwsh
         run: |
-          Write-Host "CI Pipeline is running"
-          Get-Date
-          Write-Host "Hello from GitHub Actions"
+          Install-Module Microsoft.Graph -Scope CurrentUser -Force
+
+      - name: Run Script
+        shell: pwsh
+        run: |
+          ./scripts/Get-M365Users.ps1
+
+      - name: Upload CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: M365Users
+          path: users.csv
