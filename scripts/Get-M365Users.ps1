@@ -1,7 +1,13 @@
+$ClientSecret = ConvertTo-SecureString $env:AZURE_CLIENT_SECRET -AsPlainText -Force
+
+$Credential = New-Object System.Management.Automation.PSCredential (
+    $env:AZURE_CLIENT_ID,
+    $ClientSecret
+)
+
 Connect-MgGraph `
-    -ClientId $env:AZURE_CLIENT_ID `
     -TenantId $env:AZURE_TENANT_ID `
-    -ClientSecret ($env:AZURE_CLIENT_SECRET | ConvertTo-SecureString -AsPlainText -Force)
+    -ClientSecretCredential $Credential
 
 $users = Get-MgUser -All
 
