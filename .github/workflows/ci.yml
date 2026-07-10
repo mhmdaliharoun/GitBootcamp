@@ -31,7 +31,9 @@ jobs:
         - name: Run Tests
           shell: pwsh
           run: |
-            Invoke-Pester ./tests
+           Get-Location
+           Get-ChildItem -Recurse
+           Invoke-Pester -Path ./tests -Output Detailed
 
   report:
       runs-on: ubuntu-latest
