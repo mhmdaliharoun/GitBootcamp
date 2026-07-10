@@ -6,56 +6,56 @@ on:
       - main
 
 jobs:
-validate:
+  validate:
 
-    runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
 
-    steps:
+      steps:
 
-      - uses: actions/checkout@v4
+        - uses: actions/checkout@v4
 
-      - name: Install PSScriptAnalyzer
+        - name: Install PSScriptAnalyzer
+          shell: pwsh
+          run: |
+            Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+
+        - name: Analyze Scripts
+          shell: pwsh
+          run: |
+            Invoke-ScriptAnalyzer -Path ./scripts -Recurse
+        - name: Install Pester
+          shell: pwsh
+          run: |
+            Install-Module Pester -Force -Scope CurrentUser
+
+        - name: Run Tests
         shell: pwsh
-        run: |
-          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          run: |
+            Invoke-Pester ./tests
 
-      - name: Analyze Scripts
-        shell: pwsh
-        run: |
-          Invoke-ScriptAnalyzer -Path ./scripts -Recurse
-      - name: Install Pester
-        shell: pwsh
-        run: |
-          Install-Module Pester -Force -Scope CurrentUser
+  report:
+      runs-on: ubuntu-latest
 
-      - name: Run Tests
-       shell: pwsh
-        run: |
-          Invoke-Pester ./tests
+      env:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-report:
-    runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
 
-    env:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        - name: Install Microsoft Graph
+          shell: pwsh
+          run: |
+            Install-Module Microsoft.Graph -Scope CurrentUser -Force
 
-    steps:
-      - uses: actions/checkout@v4
+        - name: Run Script
+          shell: pwsh
+          run: |
+            ./scripts/Get-M365Users.ps1
 
-      - name: Install Microsoft Graph
-        shell: pwsh
-        run: |
-          Install-Module Microsoft.Graph -Scope CurrentUser -Force
-
-      - name: Run Script
-        shell: pwsh
-        run: |
-          ./scripts/Get-M365Users.ps1
-
-      - name: Upload CSV
-        uses: actions/upload-artifact@v4
-        with:
-          name: M365Users
-          path: users.csv
+        - name: Upload CSV
+          uses: actions/upload-artifact@v4
+          with:
+            name: M365Users
+            path: users.csv
