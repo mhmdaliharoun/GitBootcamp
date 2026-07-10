@@ -14,7 +14,7 @@ Describe "Get-Hello" {
 
     It "Returns Hello" {
 
-        Get-Hello | Should -Be "Hello"
+        Get-Hello | Should Be "Hello"
 
     }
 
