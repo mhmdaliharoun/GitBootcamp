@@ -6,7 +6,34 @@ on:
       - main
 
 jobs:
-  report:
+validate:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Analyze Scripts
+        shell: pwsh
+        run: |
+          Invoke-ScriptAnalyzer -Path ./scripts -Recurse
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Install-Module Pester -Force -Scope CurrentUser
+
+      - name: Run Tests
+       shell: pwsh
+        run: |
+          Invoke-Pester ./tests
+
+report:
     runs-on: ubuntu-latest
 
     env:
