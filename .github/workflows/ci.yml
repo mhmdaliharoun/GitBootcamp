@@ -29,7 +29,7 @@ jobs:
             Install-Module Pester -Force -Scope CurrentUser
 
         - name: Run Tests
-        shell: pwsh
+          shell: pwsh
           run: |
             Invoke-Pester ./tests
 
